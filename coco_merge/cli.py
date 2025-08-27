@@ -8,12 +8,19 @@ from pathlib import Path
 from typing import Sequence
 
 from .merger import merge_datasets
+try:
+    # Prefer yolococo version if installed
+    from yolococo import __version__ as YOLOCOCO_VERSION
+except Exception:  # pragma: no cover - best-effort version display
+    YOLOCOCO_VERSION = None
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Merge multiple COCO datasets into one"
     )
+    if YOLOCOCO_VERSION:
+        parser.add_argument("--version", action="version", version=f"coco-merge (yolococo {YOLOCOCO_VERSION})")
     parser.add_argument(
         "--inputs", nargs="+", required=True, help="Paths to COCO instances JSON files"
     )

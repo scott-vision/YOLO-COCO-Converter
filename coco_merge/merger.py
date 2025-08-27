@@ -101,7 +101,7 @@ def merge_datasets(
         if sig != first_sig:
             if not align_by_name:
                 raise ValueError(
-                    "Category mismatch between dataset 0 and dataset {i}. "
+                    f"Category mismatch between dataset 0 and dataset {i}. "
                     "Use align_by_name if names match but IDs differ."
                 )
             # Align by name
