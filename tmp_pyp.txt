@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yolococo"
+version = "0.2.0"
+description = "YOLO↔COCO conversion tools with COCO dataset merging"
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["yolo", "coco", "detection", "dataset", "conversion", "merge", "annotation"]
+dependencies = [
+  "Pillow>=9.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=7.0",
+]
+
+[project.scripts]
+yolococo = "yolococo.cli:main"
+coco-merge = "coco_merge.cli:main"  # legacy/compat alias
+
+[tool.setuptools.packages.find]
+include = ["yolococo*", "coco_merge*"]
+

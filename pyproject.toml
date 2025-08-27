@@ -5,12 +5,23 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "yolococo"
 version = "0.2.0"
-description = "YOLO↔COCO conversion tools with COCO dataset merging"
-readme = "README.md"
+description = "YOLO <-> COCO conversion tools with COCO dataset merging"
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
 keywords = ["yolo", "coco", "detection", "dataset", "conversion", "merge", "annotation"]
 dependencies = [
   "Pillow>=9.0",
+]
+license = { file = "LICENSE" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Developers",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Multimedia :: Graphics",
+  "Environment :: Console",
 ]
 
 [project.optional-dependencies]
@@ -24,3 +35,7 @@ coco-merge = "coco_merge.cli:main"  # legacy/compat alias
 
 [tool.setuptools.packages.find]
 include = ["yolococo*", "coco_merge*"]
+
+[tool.setuptools]
+license-files = ["LICENSE*"]
+

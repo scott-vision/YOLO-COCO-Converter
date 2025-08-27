@@ -1,11 +1,11 @@
 # YOLO-COCO-Converter
 
-YOLO↔COCO conversion tools with an extra COCO dataset merger. Use the unified
+YOLO <-> COCO conversion tools with an extra COCO dataset merger. Use the unified
 CLI for conversions and merging, or import functions in notebooks.
 
 ## Features
-- YOLO → COCO: Build COCO JSON from YOLO labels and image sizes
-- COCO → YOLO: Write YOLO .txt labels and classes.txt from COCO
+- YOLO -> COCO: Build COCO JSON from YOLO labels and image sizes
+- COCO -> YOLO: Write YOLO .txt labels and `classes.txt` from COCO
 - Merge COCO: Merge multiple COCO datasets with id remapping and options
 - Optional Pillow for image size detection; or provide a sizes CSV
 
@@ -28,7 +28,7 @@ yolococo ...
 ```
 
 Subcommands
-- YOLO → COCO:
+- YOLO -> COCO:
   ```bash
   yolococo yolo2coco \
     --images ./images \
@@ -41,7 +41,7 @@ Subcommands
   ```
   sizes.csv format (no header): `filename,width,height`.
 
-- COCO → YOLO:
+- COCO -> YOLO:
   ```bash
   yolococo coco2yolo \
     --coco ./instances.json \
@@ -95,7 +95,7 @@ Tip for notebooks: run from the repo root (so `import yolococo` works), or add t
 - `--file-name-mode` controls whether COCO `images[].file_name` stores just the basename (`name`) or the path relative to `--images` (`relative`). When using `relative`, directory separators are `/`.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
 
 ## Testing & Visualization
 - Install dev deps: `pip install -e .[test]`
@@ -107,3 +107,4 @@ Manual visualization script:
 python scripts/visualize_labels.py
 ```
 It converts the sample in `test/` to COCO and saves overlays: `sample_annotated_from_yolo.jpg`, `sample_annotated_from_coco.jpg`, and the original image in `tests/_artifacts/`.
+

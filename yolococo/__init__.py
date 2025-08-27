@@ -1,4 +1,4 @@
-"""YOLO↔COCO conversion tools.
+"""YOLO <-> COCO conversion tools.
 
 Primary API:
 - yolo_to_coco: build a COCO dict from YOLO labels and images
@@ -11,3 +11,4 @@ from coco_merge.merger import merge_datasets
 
 __version__ = "0.2.0"
 __all__ = ["__version__", "yolo_to_coco", "coco_to_yolo_files", "merge_datasets"]
+
