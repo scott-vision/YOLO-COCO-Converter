@@ -9,12 +9,17 @@ CLI for conversions and merging, or import functions in notebooks.
 - Merge COCO: Merge multiple COCO datasets with id remapping and options
 - Optional Pillow for image size detection; or provide a sizes CSV
 
-## Install (optional)
-For a global CLI (Pillow is included by default):
+## Installation
+Install from PyPI for the CLI and library:
 ```bash
-pip install -e .
+pip install yolococo
 ```
-This installs `yolococo` (primary) and `coco-merge` (alias for merge-only).
+This provides the `yolococo` CLI (with `coco-merge` as an alias).
+
+For development or testing against the latest code:
+```bash
+pip install -e .[test]
+```
 
 ## CLI Usage
 Run as a module (no install required):
