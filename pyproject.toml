@@ -11,6 +11,7 @@ requires-python = ">=3.9"
 keywords = ["yolo", "coco", "detection", "dataset", "conversion", "merge", "annotation"]
 dependencies = [
   "Pillow>=9.0",
+  "tqdm>=4.64",
 ]
 license = { file = "LICENSE" }
 classifiers = [
