@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yolococo"
-version = "0.2.0"
+version = "0.2.1"
 description = "YOLO <-> COCO conversion tools with COCO dataset merging"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
