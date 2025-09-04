@@ -35,6 +35,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="CSV: filename,width,height (optional if Pillow installed)",
     )
+    s1.add_argument(
+        "--image-size",
+        type=int,
+        nargs=2,
+        metavar=("WIDTH", "HEIGHT"),
+        default=None,
+        help="If all images share the same size, specify WIDTH HEIGHT to skip reading image files",
+    )
     s1.add_argument("--out", type=Path, required=True, help="Output COCO JSON path")
     s1.add_argument(
         "--bbox-round",
@@ -118,6 +126,7 @@ def main(args: Sequence[str] | None = None) -> None:
                 ns.sizes,
                 bbox_round=ns.bbox_round,
                 file_name_mode=ns.file_name_mode,
+                image_size=tuple(ns.image_size) if ns.image_size else None,
             )
             ns.out.parent.mkdir(parents=True, exist_ok=True)
             with ns.out.open("w", encoding="utf-8") as f:

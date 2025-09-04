@@ -91,3 +91,17 @@ def test_yolo_to_coco_and_visualize(images_dir: Path, labels_dir: Path, sample_i
 
     # Save original too for comparison
     img.save(artifacts_dir / "sample_original.jpg", quality=95)
+
+
+def test_yolo_to_coco_with_uniform_size(monkeypatch, images_dir: Path, labels_dir: Path, sample_image: Path):
+    from PIL import Image
+
+    with Image.open(sample_image) as im:
+        size = (im.width, im.height)
+
+    def fail_open(*args, **kwargs):  # pragma: no cover - should not be called
+        raise AssertionError("Image.open should not be called when image_size is provided")
+
+    monkeypatch.setattr("PIL.Image.open", fail_open)
+    coco = yolo_to_coco(images_dir, labels_dir, image_size=size, show_progress=False)
+    assert any(img["width"] == size[0] and img["height"] == size[1] for img in coco["images"])

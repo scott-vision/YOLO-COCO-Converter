@@ -13,6 +13,11 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Union
 
+try:  # optional progress bar
+    from tqdm.auto import tqdm  # type: ignore
+except Exception:  # pragma: no cover - tqdm may be missing
+    tqdm = None  # type: ignore
+
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"}
 
 
@@ -59,6 +64,8 @@ def yolo_to_coco(
     *,
     bbox_round: Optional[int] = 2,
     file_name_mode: str = "name",
+    image_size: Optional[Tuple[int, int]] = None,
+    show_progress: bool = True,
 ) -> Dict[str, object]:
     """Convert YOLO txt labels to a COCO dataset dictionary.
 
@@ -69,6 +76,10 @@ def yolo_to_coco(
     classes_path: optional path to classes.txt (names per line)
     sizes_csv: optional CSV (no header): filename,width,height. Used if Pillow
                is not installed or fails to read a particular image.
+    image_size: (width, height) if all images share the same size. When
+                provided, individual image files are not opened for size
+                detection.
+    show_progress: display a progress bar while processing images.
 
     bbox_round:
         Number of decimals to round bbox coordinates and area. Set to a
@@ -83,7 +94,7 @@ def yolo_to_coco(
     """
 
     classes = load_classes_txt(classes_path)
-    sizes_map = load_sizes_csv(sizes_csv) if sizes_csv else {}
+    sizes_map = {} if image_size else (load_sizes_csv(sizes_csv) if sizes_csv else {})
 
     # Decide file_name formatter once
     def file_name_for(img_path: Path) -> str:
@@ -98,17 +109,21 @@ def yolo_to_coco(
         return img_path.name
 
     # Prepare size resolver once (CSV map takes precedence)
-    try:
-        from PIL import Image  # type: ignore
-        pil_available = True
-        def _read_img_size(p: Path) -> Optional[Tuple[int, int]]:
-            try:
-                with Image.open(p) as im:
-                    return im.width, im.height
-            except Exception:
+    if image_size is None:
+        try:
+            from PIL import Image  # type: ignore
+
+            def _read_img_size(p: Path) -> Optional[Tuple[int, int]]:
+                try:
+                    with Image.open(p) as im:
+                        return im.width, im.height
+                except Exception:
+                    return None
+
+        except ImportError:
+            def _read_img_size(p: Path) -> Optional[Tuple[int, int]]:
                 return None
-    except ImportError:
-        pil_available = False
+    else:  # image_size provided, no need to read from disk
         def _read_img_size(p: Path) -> Optional[Tuple[int, int]]:
             return None
 
@@ -129,16 +144,22 @@ def yolo_to_coco(
 
     seen_class_ids = set()
 
-    for img_path in img_files:
+    iter_imgs = img_files
+    if show_progress and tqdm is not None:
+        iter_imgs = tqdm(img_files, desc="YOLO→COCO", unit="img")
+
+    for img_path in iter_imgs:
         rel_name = file_name_for(img_path)
         # Resolve image size
-        if rel_name in sizes_map:
+        if image_size is not None:
+            w, h = image_size
+        elif rel_name in sizes_map:
             w, h = sizes_map[rel_name]
         else:
             size = _read_img_size(img_path)
             if size is None:
                 raise ValueError(
-                    f"Missing image size for {rel_name}. Install Pillow or provide --sizes CSV."
+                    f"Missing image size for {rel_name}. Install Pillow, provide --sizes CSV, or --image-size."
                 )
             w, h = size
 
@@ -225,6 +246,7 @@ def coco_to_yolo_files(
     *,
     keep_category_ids: bool = False,
     skip_empty_labels: bool = False,
+    show_progress: bool = True,
 ) -> None:
     """Convert COCO JSON to YOLO .txt files and write classes.txt.
 
@@ -235,6 +257,7 @@ def coco_to_yolo_files(
     out_classes_path: output path for classes.txt
     keep_category_ids: if True, YOLO indices equal COCO category ids (may be sparse)
     skip_empty_labels: if True, do not write .txt files for images without annotations
+    show_progress: display a progress bar while writing labels
     """
 
     if isinstance(coco_json, Path):
@@ -285,7 +308,11 @@ def coco_to_yolo_files(
         anns_by_image.setdefault(img_id, []).append(a)
 
     # Write label files
-    for img_id, imginfo in images.items():
+    iter_imgs = images.items()
+    if show_progress and tqdm is not None:
+        iter_imgs = tqdm(iter_imgs, total=len(images), desc="COCO→YOLO", unit="img")
+
+    for img_id, imginfo in iter_imgs:
         w, h = imginfo.get("width"), imginfo.get("height")
         if not (isinstance(w, int) and isinstance(h, int) and w > 0 and h > 0):
             raise ValueError(
