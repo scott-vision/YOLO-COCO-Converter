@@ -5,6 +5,7 @@ CLI for conversions and merging, or import functions in notebooks.
 
 ## Features
 - YOLO -> COCO: Build COCO JSON from YOLO labels and image sizes
+- Categories in COCO output now include a `supercategory` field (defaults to the class name)
 - COCO -> YOLO: Write YOLO .txt labels and `classes.txt` from COCO
 - Merge COCO: Merge multiple COCO datasets with id remapping and options
 - Optional Pillow for image size detection; or provide a sizes CSV

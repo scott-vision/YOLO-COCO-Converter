@@ -117,10 +117,13 @@ def merge_datasets(
             cat_map = {int(c["id"]): int(c["id"]) for c in cats}
         cat_maps.append(cat_map)
 
-    merged_categories = sorted(
-        [{"id": int(c["id"]), "name": c.get("name", "")} for c in first_cats],
-        key=lambda c: c["id"],
-    )
+    def _copy_cat(c: dict) -> dict:
+        new_c = {"id": int(c["id"]), "name": c.get("name", "")}
+        if "supercategory" in c:
+            new_c["supercategory"] = c.get("supercategory", "")
+        return new_c
+
+    merged_categories = sorted([_copy_cat(c) for c in first_cats], key=lambda c: c["id"])
 
     # Licenses: collect, dedup, and build mapping per dataset
     all_licenses = []
