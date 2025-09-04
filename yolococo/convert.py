@@ -66,6 +66,8 @@ def yolo_to_coco(
     file_name_mode: str = "name",
     image_size: Optional[Tuple[int, int]] = None,
     show_progress: bool = True,
+    info: Optional[Dict[str, object]] = None,
+    supercategory: Optional[str] = None,
 ) -> Dict[str, object]:
     """Convert YOLO txt labels to a COCO dataset dictionary.
 
@@ -80,6 +82,12 @@ def yolo_to_coco(
                 provided, individual image files are not opened for size
                 detection.
     show_progress: display a progress bar while processing images.
+    info:
+        Optional dict to populate the top-level COCO ``info`` field.
+        If omitted, an empty dict is used.
+    supercategory:
+        If provided, use this string for all category ``supercategory``
+        values. By default, each category uses its own name.
 
     bbox_round:
         Number of decimals to round bbox coordinates and area. Set to a
@@ -90,7 +98,7 @@ def yolo_to_coco(
 
     Returns
     -------
-    dict: COCO dataset with keys images, annotations, categories
+    dict: COCO dataset with keys info, images, annotations, categories
     """
 
     classes = load_classes_txt(classes_path)
@@ -136,7 +144,13 @@ def yolo_to_coco(
     # Build categories (if classes known now)
     if classes:
         for i, name in enumerate(classes):
-            categories.append({"id": i, "name": name, "supercategory": name})
+            categories.append(
+                {
+                    "id": i,
+                    "name": name,
+                    "supercategory": supercategory if supercategory is not None else name,
+                }
+            )
 
     img_files = sorted([p for p in images_dir.rglob("*") if p.suffix.lower() in IMAGE_EXTS])
     if not img_files:
@@ -234,7 +248,7 @@ def yolo_to_coco(
                 {
                     "id": cid,
                     "name": f"class_{cid}",
-                    "supercategory": f"class_{cid}",
+                    "supercategory": supercategory if supercategory is not None else f"class_{cid}",
                 }
                 for cid in sorted(seen_class_ids)
             ]
@@ -242,7 +256,12 @@ def yolo_to_coco(
             else []
         )
 
-    coco = {"images": images, "annotations": annotations, "categories": categories}
+    coco = {
+        "info": info or {},
+        "images": images,
+        "annotations": annotations,
+        "categories": categories,
+    }
     return coco
 
 

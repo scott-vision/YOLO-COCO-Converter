@@ -56,6 +56,16 @@ def build_parser() -> argparse.ArgumentParser:
         default="name",
         help="COCO image file_name mode: basename or path relative to --images",
     )
+    s1.add_argument(
+        "--info",
+        default=None,
+        help="JSON string or path to JSON file for COCO 'info' field",
+    )
+    s1.add_argument(
+        "--supercategory",
+        default=None,
+        help="If set, use this string for all category supercategories",
+    )
 
     # coco2yolo
     s2 = sub.add_parser("coco2yolo", help="Convert COCO JSON to YOLO txt labels")
@@ -119,6 +129,14 @@ def main(args: Sequence[str] | None = None) -> None:
 
     try:
         if ns.cmd == "yolo2coco":
+            info_obj = None
+            if ns.info:
+                info_candidate = Path(ns.info)
+                if info_candidate.exists():
+                    with info_candidate.open("r", encoding="utf-8") as f:
+                        info_obj = json.load(f)
+                else:
+                    info_obj = json.loads(ns.info)
             coco = yolo_to_coco(
                 ns.images,
                 ns.labels,
@@ -127,6 +145,8 @@ def main(args: Sequence[str] | None = None) -> None:
                 bbox_round=ns.bbox_round,
                 file_name_mode=ns.file_name_mode,
                 image_size=tuple(ns.image_size) if ns.image_size else None,
+                info=info_obj,
+                supercategory=ns.supercategory,
             )
             ns.out.parent.mkdir(parents=True, exist_ok=True)
             with ns.out.open("w", encoding="utf-8") as f:
