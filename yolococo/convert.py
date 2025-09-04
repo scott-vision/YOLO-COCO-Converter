@@ -136,7 +136,7 @@ def yolo_to_coco(
     # Build categories (if classes known now)
     if classes:
         for i, name in enumerate(classes):
-            categories.append({"id": i, "name": name})
+            categories.append({"id": i, "name": name, "supercategory": name})
 
     img_files = sorted([p for p in images_dir.rglob("*") if p.suffix.lower() in IMAGE_EXTS])
     if not img_files:
@@ -230,7 +230,14 @@ def yolo_to_coco(
     # If classes.txt was missing, synthesize categories from seen ids
     if not categories:
         categories = (
-            [{"id": cid, "name": f"class_{cid}"} for cid in sorted(seen_class_ids)]
+            [
+                {
+                    "id": cid,
+                    "name": f"class_{cid}",
+                    "supercategory": f"class_{cid}",
+                }
+                for cid in sorted(seen_class_ids)
+            ]
             if seen_class_ids
             else []
         )

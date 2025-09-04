@@ -47,6 +47,8 @@ def test_yolo_to_coco_and_visualize(images_dir: Path, labels_dir: Path, sample_i
     # Basic sanity checks
     assert "images" in coco and "annotations" in coco and "categories" in coco
     assert any(img["file_name"] == sample_image.name for img in coco["images"])  # image present
+    assert all("supercategory" in c for c in coco["categories"])  # categories have supercategory
+    assert all(c["supercategory"] == c["name"] for c in coco["categories"])  # default value
 
     # Save COCO JSON artifact for manual inspection
     (artifacts_dir / "coco.json").write_text(json.dumps(coco, ensure_ascii=False, indent=2), encoding="utf-8")
