@@ -5,7 +5,8 @@ CLI for conversions and merging, or import functions in notebooks.
 
 ## Features
 - YOLO -> COCO: Build COCO JSON from YOLO labels and image sizes
-- Categories in COCO output now include a `supercategory` field (defaults to the class name)
+- Categories in COCO output include a `supercategory` field (defaults to the class name or a user override)
+- Optional COCO `info` metadata in outputs
 - COCO -> YOLO: Write YOLO .txt labels and `classes.txt` from COCO
 - Merge COCO: Merge multiple COCO datasets with id remapping and options
 - Optional Pillow for image size detection; or provide a sizes CSV
@@ -45,6 +46,8 @@ Subcommands
     --image-size 1920 1080 \     # optional; skip per-image size reads
     --bbox-round 2 \             # decimals for bbox/area (use <0 to disable)
     --file-name-mode name \      # name | relative
+    --info '{"description":"my dataset"}' \  # optional COCO info
+    --supercategory object \      # optional: set all supercategories
     --out ./coco.json
   ```
   sizes.csv format (no header): `filename,width,height`.
@@ -83,6 +86,8 @@ coco = yolo_to_coco(
     classes_path=Path("./classes.txt"),  # or None
     sizes_csv=None,  # or Path("./sizes.csv")
     image_size=(1920, 1080),  # optional uniform size
+    info={"description": "my dataset"},  # optional COCO info
+    supercategory="object",  # optional: set all supercategories
 )
 with open("coco.json", "w", encoding="utf-8") as f:
     json.dump(coco, f, ensure_ascii=False, indent=2)

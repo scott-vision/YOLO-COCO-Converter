@@ -107,3 +107,17 @@ def test_yolo_to_coco_with_uniform_size(monkeypatch, images_dir: Path, labels_di
     monkeypatch.setattr("PIL.Image.open", fail_open)
     coco = yolo_to_coco(images_dir, labels_dir, image_size=size, show_progress=False)
     assert any(img["width"] == size[0] and img["height"] == size[1] for img in coco["images"])
+
+
+def test_yolo_to_coco_info_and_supercategory(images_dir: Path, labels_dir: Path):
+    info = {"description": "test dataset"}
+    sc = "thing"
+    coco = yolo_to_coco(
+        images_dir,
+        labels_dir,
+        info=info,
+        supercategory=sc,
+        show_progress=False,
+    )
+    assert coco["info"] == info
+    assert all(c["supercategory"] == sc for c in coco["categories"])
